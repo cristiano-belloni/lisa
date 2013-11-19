@@ -1,0 +1,24 @@
+.container {
+    text-align:center;
+    color: whitesmoke;
+    font-family: monospace;
+}
+input {
+    width: 8%;
+    text-align:center;
+}
+.note-numbers div {
+    text-align: center;
+    display:inline-block;
+    width:9.1%;
+    background:black;
+    color:white;
+    margin: 0;
+}
+.controls button {
+    margin-top:2%;
+    width:15%;
+}
+.controls input {
+    width:15%;
+}
