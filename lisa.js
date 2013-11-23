@@ -42,19 +42,25 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
         this.steps = 8; // TODO this will be variable
 
         this.schedulerCursor = 0; // current playing position
+        this.cursorIncrement = 0;
 
         this.incrementScheduleCursor = function (){
             this.schedulerCursor = (this.schedulerCursor + 1) % this.steps;
+            this.cursorIncrement += 1;
         };
 
         this.resetScheduleCursor = function () {
             this.schedulerCursor = 0;
         };
 
+        this.resetIncrementCursor = function () {
+            this.cursorIncrement = 0;
+        };
+
         this.play = function (startTime, interval) {
 
             // Send a deferred MIDI, starting in: tolerance (delay) in seconds + start time + interval in seconds * step
-            var when = this.tolerance / 1000 + startTime + (interval * this.schedulerCursor) / 1000;
+            var when = this.tolerance / 1000 + startTime + (interval * this.cursorIncrement) / 1000;
 
             // Read the message description from the status
             var note = this.status.notes[this.schedulerCursor];
@@ -64,7 +70,8 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
             // Build the message
             var msg = {/*TODO note, vel, ch*/};
 
-            this.midiHandler.sendMIDIMessage (msg, when);
+            console.log ("sending message, number, when",this.schedulerCursor , when);
+            //this.midiHandler.sendMIDIMessage (msg, when);
 
             // TODO probably we need to send a midi off when the note ends.
             // Here we need to decide if continue the note until a new one starts
@@ -76,9 +83,9 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
 
         this.startScheduler = function () {
             this.playing = true;
-            var interval = this.status.tempo / 60 * 1000; // Beat interval in ms
+            var interval = (this.status.tempo / 60 * 1000) / 8; // Beat interval in ms
             var timeNow = this.context.currentTime;
-            this.schedulerInterval = setInterval(this.play, interval, [timeNow, interval]);
+            this.schedulerInterval = setInterval(this.play, interval, timeNow, interval);
         };
 
         this.stopScheduler = function () {
@@ -88,6 +95,7 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
 
         this.pauseScheduler = function () {
             this.playing = false;
+            this.resetIncrementCursor();
             clearInterval(this.schedulerInterval);
         };
 
@@ -104,21 +112,21 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
                         console.log ("Play");
 
                         // Reset status
-                        status.notes = [];
-                        status.channels = [];
-                        status.velocities = [];
+                        this.status.notes = [];
+                        this.status.channels = [];
+                        this.status.velocities = [];
 
                         // Populate status, parsing fields.
                         for (var i = 0; i < 8; i += 1) {
 
-                            status.notes[i] = parseInt(noteInputs[i].value, 10);
-                            console.log ("note " + i + ": " + status.notes[i]);
+                            this.status.notes[i] = parseInt(noteInputs[i].value, 10);
+                            console.log ("note " + i + ": " + this.status.notes[i]);
 
-                            status.channels[i] = parseInt(chInputs[i].value, 10);
-                            console.log ("channel " + i + ": " + status.channels[i]);
+                            this.status.channels[i] = parseInt(chInputs[i].value, 10);
+                            console.log ("channel " + i + ": " + this.status.channels[i]);
 
-                            status.velocities[i] = parseInt(velInputs[i].value, 10);
-                            console.log ("vel " + i + ": " + status.velocities[i]);
+                            this.status.velocities[i] = parseInt(velInputs[i].value, 10);
+                            console.log ("vel " + i + ": " + this.status.velocities[i]);
 
                         }
 
