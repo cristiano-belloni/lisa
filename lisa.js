@@ -93,7 +93,8 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
 
         this.startScheduler = function () {
             this.playing = true;
-            var interval = (this.status.tempo / 60 * 1000) / 8; // Beat interval in ms
+            var interval = (60 / this.status.tempo * 1000) / 2; // Beat interval in ms
+            console.log ("Interval is: " + interval + " milliseconds");
             var timeNow = this.context.currentTime;
             this.schedulerInterval = setInterval(this.play, interval, timeNow, interval);
         };
@@ -141,7 +142,7 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
                         }
 
                         this.status.tempo = parseInt(tempo.value, 10);
-                        if (isNaN(tempo)) {
+                        if (isNaN(this.status.tempo)) {
                             this.status.tempo = 60; // Default tempo is 60 bpm
                         }
                         console.log ("tempo: " + this.status.tempo);
