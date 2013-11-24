@@ -68,14 +68,24 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
             var ch = this.status.channels[this.schedulerCursor];
 
             // Build the message
-            var msg = {/*TODO note, vel, ch*/};
-
-            console.log ("sending message, number, when",this.schedulerCursor , when);
-            //this.midiHandler.sendMIDIMessage (msg, when);
+            console.log ("sending on message, number, when", this.schedulerCursor , when);
+            var msg = { type: "noteon",
+                        channel: ch,
+                        pitch: note,
+                        velocity: vel
+            }
+            this.midiHandler.sendMIDIMessage (msg, when);
 
             // TODO probably we need to send a midi off when the note ends.
             // Here we need to decide if continue the note until a new one starts
             // Or to kill the note at the start of the new step (aka we need a switch)
+            console.log ("sending off message, number, when", this.schedulerCursor , when + interval / 1000);
+            msg = { type: "noteoff",
+                channel: ch,
+                pitch: note,
+                velocity: vel
+            }
+            this.midiHandler.sendMIDIMessage (msg, when + interval / 1000);
 
             this.incrementScheduleCursor();
 
@@ -155,6 +165,10 @@ define(['require', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa
                         break;
                 }
             }
+        }.bind(this));
+
+        args.hostInterface.setDestructor (function () {
+            this.stopScheduler();
         }.bind(this));
 
         // Initialization made it so far: plugin is ready.
