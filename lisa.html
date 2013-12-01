@@ -1,55 +1,79 @@
-<div>
-    <div class="container">
-        <div class="note-numbers">
-            <div>1</div>
-            <div>2</div>
-            <div>3</div>
-            <div>4</div>
-            <div>5</div>
-            <div>6</div>
-            <div>7</div>
-            <div>8</div>
-        </div>
-        <span>Note</span>
-        <div class="notes">
-            <input id="note1"/>
-            <input id="note2"/>
-            <input id="note3"/>
-            <input id="note4"/>
-            <input id="note5"/>
-            <input id="note6"/>
-            <input id="note7"/>
-            <input id="note8"/>
-        </div>
-        <span>Channel</span>
-        <div class="channels">
-            <input id="ch1"/>
-            <input id="ch2"/>
-            <input id="ch3"/>
-            <input id="ch4"/>
-            <input id="ch5"/>
-            <input id="ch6"/>
-            <input id="ch7"/>
-            <input id="ch8"/>
-        </div>
-        <span>Velocity</span>
-        <div class="velocities">
-            <input id="vel1"/>
-            <input id="vel2"/>
-            <input id="vel3"/>
-            <input id="vel4"/>
-            <input id="vel5"/>
-            <input id="vel6"/>
-            <input id="vel7"/>
-            <input id="vel8"/>
-        </div>
-        <div class="controls">
-            <button id="play">Play</button>
-            <button id="pause">Pause</button>
-            <button id="stop">Stop</button>
-        </div>
-        <div class="tempo">
-            <span>Tempo </span><input/>
-        </div>
+<div class="lisa-container">
+    <div class="lisa-label tempo-label">BPM</div>
+    <input class="tempo"/>
+
+    <div class="lisa-label octave-label">Octave</div>
+    <input class="octave"/>
+
+    <div class="dropdown-page">
+        <select>
+            <option selected>Pitch</option>
+            <option>Velocity</option>
+            <option>Channel</option>
+        </select>
     </div>
+
+    <div class="flat-button flat-button-2 button  play">Play</div>
+    <div class="flat-button flat-button-2 button  stop">Stop</div>
+
+    <div class="bar-container">
+        <div class = "note-legend-container hidden">
+            <div class = "note-legend line-light note-c"><span>C</span></div>
+            <div class = "note-legend line-dark note-cs"><span>C#</span></div>
+            <div class = "note-legend line-light note-d"><span>D</span></div>
+            <div class = "note-legend line-dark note-ds"><span>D#</span></div>
+            <div class = "note-legend line-light note-e"><span>E</span></div>
+            <div class = "note-legend line-dark note-f"><span>F</span></div>
+            <div class = "note-legend line-light note-fs"><span>F#</span></div>
+            <div class = "note-legend line-dark note-g"><span>G</span></div>
+            <div class = "note-legend line-light note-gs"><span>G#</span></div>
+            <div class = "note-legend line-dark note-a"><span>A</span></div>
+            <div class = "note-legend line-light note-as"><span>A#</span></div>
+            <div class = "note-legend line-dark note-b"><span>B</span></div>
+        </div>
+        <div class = "velocity-legend-container hidden">
+            <div class = "velocity-legend line-light vel-1"><span>16</span></div>
+            <div class = "velocity-legend line-dark vel-2"><span>31</span></div>
+            <div class = "velocity-legend line-light vel-3"><span>47</span></div>
+            <div class = "velocity-legend line-dark vel-4"><span>62</span></div>
+            <div class = "velocity-legend line-light vel-5"><span>78</span></div>
+            <div class = "velocity-legend line-dark vel-6"><span>95</span></div>
+            <div class = "velocity-legend line-light vel-7"><span>111</span></div>
+            <div class = "velocity-legend line-dark vel-8"><span>127</span></div>
+        </div>
+        <div class = "channel-legend-container hidden">
+            <div class = "channel-legend line-light channel-1"><span>1</span></div>
+            <div class = "channel-legend line-dark  channel-2"><span>2</span></div>
+            <div class = "channel-legend line-light channel-3"><span>3</span></div>
+            <div class = "channel-legend line-dark  channel-4"><span>4</span></div>
+            <div class = "channel-legend line-light channel-5"><span>5</span></div>
+            <div class = "channel-legend line-dark  channel-6"><span>6</span></div>
+            <div class = "channel-legend line-light channel-7"><span>7</span></div>
+            <div class = "channel-legend line-dark  channel-8"><span>8</span></div>
+            <div class = "channel-legend line-light channel-9"><span>9</span></div>
+            <div class = "channel-legend line-dark  channel-10"><span>10</span></div>
+            <div class = "channel-legend line-light channel-11"><span>11</span></div>
+            <div class = "channel-legend line-dark  channel-12"><span>12</span></div>
+            <div class = "channel-legend line-light channel-13"><span>13</span></div>
+            <div class = "channel-legend line-dark  channel-14"><span>14</span></div>
+            <div class = "channel-legend line-light channel-15"><span>15</span></div>
+            <div class = "channel-legend line-dark  channel-16"><span>16</span></div>
+        </div>
+        <div class = "dynamic-legend-container">
+            <div class="step-legend step-0-legend"></div>
+            <div class="step-legend step-1-legend"></div>
+            <div class="step-legend step-2-legend"></div>
+            <div class="step-legend step-3-legend"></div>
+            <div class="step-legend step-4-legend"></div>
+            <div class="step-legend step-5-legend"></div>
+            <div class="step-legend step-6-legend"></div>
+            <div class="step-legend step-7-legend"></div>
+        </div>
+        <canvas width="294" height="240" class="bars"></canvas>
+    </div>
+
+    <div class="pattern-label">Pattern Number</div>
+    <input maxlength="2" class="pattern-num"/>
+    <div class="pattern-total-label">Total Patterns</div>
+    <input maxlength="2" class="patterns-total">
 </div>
