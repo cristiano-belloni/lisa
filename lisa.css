@@ -201,6 +201,38 @@ input {
     right: 4px;
 }
 
+.step-octave-legend {
+    position: absolute;
+    top: 0px;
+    width: 26px;
+    font-family: "Helvetica Neue";
+}
+
+.step-0-octave {
+    left: 45px;
+}
+.step-1-octave {
+    left: 81px;
+}
+.step-2-octave {
+    left: 117px;
+}
+.step-3-octave {
+    left: 153px;
+}
+.step-4-octave {
+    left: 189px;
+}
+.step-5-octave {
+    left: 225px;
+}
+.step-6-octave {
+    left: 261px;
+}
+.step-7-octave {
+    left: 297px;
+}
+
 .note-legend {
     color: white;
     position: absolute;
