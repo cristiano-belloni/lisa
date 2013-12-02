@@ -1,6 +1,6 @@
 <div class="lisa-container">
     <div class="lisa-label tempo-label">BPM</div>
-    <input class="tempo"/>
+    <input step="0.1" min="20" max="300" type="number" class="tempo"/>
 
     <div class="lisa-label octave-label">Octave</div>
     <input class="octave"/>
@@ -82,7 +82,7 @@
     </div>
 
     <div class="pattern-label">Pattern Number</div>
-    <input maxlength="2" class="pattern-num"/>
+    <input maxlength="2" min="0" max="31" type="number" class="pattern-num"/>
     <div class="pattern-total-label">Total Patterns</div>
-    <input maxlength="2" class="patterns-total">
+    <input maxlength="2" min="1" max="32" type="number" class="patterns-total">
 </div>

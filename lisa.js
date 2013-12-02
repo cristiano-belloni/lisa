@@ -224,7 +224,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.setTempo = function (tempo) {
             var nt = parseInt (tempo, 10);
-            if (!isNaN(nt) && nt != this.lisaStatus.tempo && (nt > 10 && nt < 120) /* TODO */) {
+            if (!isNaN(nt) && nt != this.lisaStatus.tempo && (nt > 20 && nt < 300) /* TODO */) {
                 this.tempo = nt;
             }
             else {
