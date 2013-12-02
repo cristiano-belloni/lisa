@@ -105,6 +105,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.tempoInput = this.domEl.querySelector(".tempo");
         this.octaveInput = this.domEl.querySelector(".octave");
         this.stepLegendList = this.domEl.querySelectorAll('.step-legend');
+        this.octaveLegendList = this.domEl.querySelectorAll('.step-octave-legend');
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
             'velocity': this.domEl.querySelector('.velocity-legend-container'),
@@ -159,7 +160,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 this.ui.setValue ({elementID: el.ID, slot: 'barvalue', value: value});
             }
             this.ui.refresh();
-        }
+        };
+
+        this.reInitOctaveLegend = function (valueArr) {
+            for (var i = 0; i < this.barElements.length; i+=1) {
+                // TODO this.refreshOctaveLegend (i, valueArr[i].octave);
+                this.refreshOctaveLegend (i, Math.floor((valueArr[i] + 1) / 12) - 1);
+            }
+        };
 
         this.switchPage = function () {
             // Hide / show static legend classes
@@ -196,6 +204,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         return ranged_value;
                     }
                     this.reInitBars(this.colorSchemas.pitch, this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch, translate);
+                    this.reInitOctaveLegend(this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch);
                     this.tempOctave = this.lisaStatus.octave;
                     break;
             }
@@ -287,6 +296,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             console.log ("Note name is: ", name);
 
             this.stepLegendList[bar_num].innerHTML = name;
+        };
+
+        this.refreshOctaveLegend = function (step, octave) {
+            var octValue =  octave;
+            if (octave === -1) {
+               octValue = ''; 
+            }
+            this.octaveLegendList[step].value = octValue;
         }
 
         this.lisaStatus = {
