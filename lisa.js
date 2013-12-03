@@ -61,7 +61,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         channel: ch,
                         pitch: note,
                         velocity: vel
-            }
+            };
             this.midiHandler.sendMIDIMessage (msg, when);
 
             // TODO probably we need to send a midi off when the note ends.
@@ -72,7 +72,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 channel: ch,
                 pitch: note,
                 velocity: vel
-            }
+            };
             this.midiHandler.sendMIDIMessage (msg, when + interval / 1000);
 
             this.incrementScheduleCursor();
@@ -130,18 +130,18 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 }
             }
             elem.className = setClass.replace(/^\s+|\s+$/g,'');//trim
-        }
+        };
 
         var RemoveClassFromElement = function (elem,value){
             var rspaces = /\s+/;
-            var rclass = /[\n\t]/g
+            var rclass = /[\n\t]/g;
             var classNames = (value || "").split( rspaces );
             var className = (" " + elem.className + " ").replace(rclass, " ");
             for ( var c = 0, cl = classNames.length; c < cl; c++ ) {
                 className = className.replace(" " + classNames[c] + " ", " ");
             }
             elem.className = className.replace(/^\s+|\s+$/g,'');//trim
-        }
+        };
 
         this.reInitBars = function (colors, valueArr, translateFunc) {
             for (var i = 0; i < this.barElements.length; i+=1) {
@@ -153,7 +153,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 if (!valueArr[i]) {
                     valueArr[i] = 0;
                 }
-                var value = valueArr[i];
+                var value = valueArr.semitone[i];
                 if (typeof translateFunc === 'function') {
                     value = translateFunc.apply(this, [value]);
                 }
@@ -164,14 +164,13 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.reInitOctaveLegend = function (valueArr) {
             for (var i = 0; i < this.barElements.length; i+=1) {
-                // TODO this.refreshOctaveLegend (i, valueArr[i].octave);
-                this.refreshOctaveLegend (i, Math.floor((valueArr[i] + 1) / 12) - 1);
+                this.refreshOctaveLegend (i, valueArr.octave[i]);
             }
         };
 
         this.switchPage = function () {
             // Hide / show static legend classes
-            for (legendContainerEl in this.staticLegends) {
+            for (var legendContainerEl in this.staticLegends) {
                 if (legendContainerEl !== this.lisaStatus.page) {
                     // hide
                     AddClassToElement(this.staticLegends[legendContainerEl], 'hidden');
@@ -184,31 +183,23 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
             switch (this.lisaStatus.page) {
                 case 'velocity':
-                    // Disable the octave input
-                    this.octaveInput.readOnly = true;
                     this.reInitBars(this.colorSchemas.velocity, this.lisaStatus.matrix[this.lisaStatus.currPattern].velocity);
                     break;
                 case 'channel':
-                    // Disable the octave input
-                    this.octaveInput.readOnly = true;
                     this.reInitBars(this.colorSchemas.channel, this.lisaStatus.matrix[this.lisaStatus.currPattern].channel);
                     break;
                 case 'pitch':
                     // Enable the octave input
                     this.octaveInput.readOnly = false;
                     var translate = function (value) {
-                        var ranged_value = ((value + 1) % 12) / 12;
-                        var note_octave = Math.floor((value + 1) / 12) - 1;
-                        this.tempOctave = note_octave;
-                        console.log ("value / ranged", value, ranged_value);
+                        var ranged_value = (value + 1) / 12;
                         return ranged_value;
-                    }
+                    };
                     this.reInitBars(this.colorSchemas.pitch, this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch, translate);
                     this.reInitOctaveLegend(this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch);
-                    this.tempOctave = this.lisaStatus.octave;
                     break;
             }
-        }
+        };
 
         this.setRedrawPattern = function (newPattern) {
             if (this.lisaStatus.currPattern !== newPattern) {
@@ -216,7 +207,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 this.lisaStatus.currPattern = newPattern;
                 this.switchPage();
             }
-        }
+        };
 
         this.setTotalPatterns = function (newPattern) {
             var np = parseInt(newPattern, 10);
@@ -229,7 +220,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             else {
                 this.patternTotalInput.value = this.lisaStatus.numPatterns;
             }
-        }
+        };
 
         this.setTempo = function (tempo) {
             var nt = parseInt (tempo, 10);
@@ -239,18 +230,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             else {
                 this.tempoInput.value = this.lisaStatus.tempo;
             }
-        }
-
-        this.setOctave = function (octave) {
-            var no = parseInt (octave, 10);
-            if (!isNaN(no) && no != this.lisaStatus.octave && no < 10 /* TODO */) {
-                this.lisaStatus.octave = no;
-                this.tempOctave = this.lisaStatus.octave;
-            }
-            else {
-                this.octaveInput.value = this.lisaStatus.octave;
-            }
-        }
+        };
 
         this.select.addEventListener("change",function(e) {
             console.log ("Changed value of dropdown", e.target.value);
@@ -279,10 +259,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             this.setTempo(e.target.value);
         }.bind(this));
 
-        this.octaveInput.addEventListener("change",function(e) {
-            this.setOctave(e.target.value);
-        }.bind(this));
-
         this.refreshNoteLegend = function (normal_value, midi_note, bar_num) {
             // note name
             var name;
@@ -301,10 +277,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.refreshOctaveLegend = function (step, octave) {
             var octValue =  octave;
             if (octave === -1) {
-               octValue = ''; 
+               octValue = '';
             }
             this.octaveLegendList[step].value = octValue;
-        }
+        };
 
         this.lisaStatus = {
             matrix: [],
@@ -312,13 +288,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             numPatterns: 4,
             currPattern: 0,
             tempo: 60,
-            octave: 4
-        }
-        this.tempOctave = this.lisaStatus.octave;
+        };
 
         for (var i = 0; i < 32; i+=1 ) {
             this.lisaStatus.matrix.push ({
-                pitch: [-1,-1,-1,-1,-1,-1,-1,-1],
+                pitch: {
+                    semitone: [-1,-1,-1,-1,-1,-1,-1,-1],
+                    octave: ['','','','','','','','']
+                },
                 velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
                 channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625]
             });
@@ -350,19 +327,15 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         this.ui.setValue ({elementID: element, slot: slot, value: normal_value, fireCallback:false});
                     }
                     else {
+                        var st = normal_value === 0 ? -1 : (normal_value * 12 - 1);
+                        console.log ("Setting note ", st);
 
-                        var midi_note = normal_value == 0 ? -1 : (normal_value * 12 - 1) + (this.tempOctave + 1)* 12;
-                        console.log ("Setting note ", midi_note);
-
-                        this.refreshNoteLegend (normal_value, midi_note, bar_num);
-
-                        this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch[bar_num] = midi_note;
-
-
+                        this.refreshNoteLegend (normal_value, st, bar_num);
+                        this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[bar_num] = st;
                     }
                 }
                 else if (this.lisaStatus.page === 'velocity') {
-                    var vel = Math.round (value*127);
+                    var vel = Math.round (value * 127);
                     this.lisaStatus.matrix[this.lisaStatus.currPattern].velocity[bar_num] = value;
                     this.stepLegendList[bar_num].innerHTML = vel;
                 }
@@ -384,7 +357,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.barElements = [];
 
-        for (var i = 0; i < 8; i += 1) {
+        for (i = 0; i < 8; i += 1) {
             clickBarArgs.ID = "bar_" + i;
             clickBarArgs.left = (i * barWidth + (i+1) * spaceWidth);
             var el = new K2.ClickBar(clickBarArgs);
@@ -397,7 +370,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.setRedrawPattern("0");
         this.setTotalPatterns();
         this.setTempo();
-        this.setOctave();
 
         args.hostInterface.setDestructor (function () {
             this.stopScheduler();
