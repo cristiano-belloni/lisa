@@ -154,7 +154,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 if (!valueArr[i]) {
                     valueArr[i] = 0;
                 }
-                var value = valueArr.semitone[i];
+                var value = valueArr[i];
                 if (typeof translateFunc === 'function') {
                     value = translateFunc.apply(this, [value]);
                 }
@@ -194,7 +194,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         var ranged_value = (value + 1) / 12;
                         return ranged_value;
                     };
-                    this.reInitBars(this.colorSchemas.pitch, this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch, translate);
+                    this.reInitBars(this.colorSchemas.pitch, this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone, translate);
                     this.reInitOctaveLegend(this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch);
                     break;
             }
