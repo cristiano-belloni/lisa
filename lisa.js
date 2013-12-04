@@ -103,9 +103,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.patternNumInput = this.domEl.querySelector(".pattern-num");
         this.patternTotalInput = this.domEl.querySelector(".patterns-total");
         this.tempoInput = this.domEl.querySelector(".tempo");
-        this.octaveInput = this.domEl.querySelector(".octave");
         this.stepLegendList = this.domEl.querySelectorAll('.step-legend');
         this.octaveLegendList = this.domEl.querySelectorAll('.step-octave-legend');
+        this.octaveInput = this.domEl.querySelector(".octave-inputs");
+
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
             'velocity': this.domEl.querySelector('.velocity-legend-container'),
@@ -189,8 +190,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     this.reInitBars(this.colorSchemas.channel, this.lisaStatus.matrix[this.lisaStatus.currPattern].channel);
                     break;
                 case 'pitch':
-                    // Enable the octave input
-                    this.octaveInput.readOnly = false;
                     var translate = function (value) {
                         var ranged_value = (value + 1) / 12;
                         return ranged_value;
@@ -241,6 +240,23 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             }
         }.bind(this));
 
+        this.octaveInput.addEventListener("change",function(e) {
+            console.log ("Changed value of one of the octave input", e.target.id, e.target.value);
+            var value = e.target.value;
+            var inputN = e.srcElement.className.split(" ")[1].split("-")[1];
+            value = parseInt(value, 10);
+            if (isNaN(value)) {
+                this.octaveLegendList[inputN].value = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave[inputN];
+                return;
+            }
+            inputN = parseInt(inputN, 10);
+            this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave[inputN] = value;
+            // Change note legend
+            var st = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[inputN];
+            this.refreshNoteLegend (st, value, inputN)
+
+        }.bind(this));
+
         this.patternNumInput.addEventListener("change",function(e) {
             var np = parseInt(e.target.value, 10);
             if (!isNaN(np) && np != this.lisaStatus.currPattern && np < this.lisaStatus.numPatterns) {
@@ -259,13 +275,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             this.setTempo(e.target.value);
         }.bind(this));
 
-        this.refreshNoteLegend = function (normal_value, midi_note, bar_num) {
+        this.refreshNoteLegend = function (st, oct, bar_num) {
             // note name
             var name;
-            if (midi_note === -1 || normal_value === 0) {
+            if (st === -1 || isNaN(oct)) {
                 name = "--";
             }
             else {
+                var midi_note = (oct + 1) * 12 + st;
                 var nn = Note.prototype.midi2Name(midi_note);
                 name = nn.name.split('/')[0];
             }
@@ -287,14 +304,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             page: 'pitch',
             numPatterns: 4,
             currPattern: 0,
-            tempo: 60,
+            tempo: 60
         };
 
         for (var i = 0; i < 32; i+=1 ) {
             this.lisaStatus.matrix.push ({
                 pitch: {
                     semitone: [-1,-1,-1,-1,-1,-1,-1,-1],
-                    octave: ['','','','','','','','']
+                    octave: [4,4,4,4,4,4,4,4]
                 },
                 velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
                 channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625]
@@ -330,8 +347,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         var st = normal_value === 0 ? -1 : (normal_value * 12 - 1);
                         console.log ("Setting note ", st);
 
-                        this.refreshNoteLegend (normal_value, st, bar_num);
                         this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[bar_num] = st;
+                        var oct = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave[bar_num];
+
+                        this.refreshNoteLegend (st, oct, bar_num);
                     }
                 }
                 else if (this.lisaStatus.page === 'velocity') {
