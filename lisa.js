@@ -26,8 +26,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.playing = false;
 
-        this.tolerance = 200; // ms
-        this.steps = 8; // TODO this will be variable
+        this.tolerance = 200;
+        this.steps = 8;
 
         this.schedulerCursor = 0; // current playing position
         this.cursorIncrement = 0;
@@ -51,29 +51,35 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             var when = this.tolerance / 1000 + startTime + (interval * this.cursorIncrement) / 1000;
 
             // Read the message description from the status
-            var note = this.status.notes[this.schedulerCursor];
-            var vel = this.status.velocities[this.schedulerCursor];
-            var ch = this.status.channels[this.schedulerCursor];
+            var note = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone;
+            var octave = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave;
+            var vel = this.lisaStatus.matrix[this.lisaStatus.currPattern].velocity;
+            var ch = this.lisaStatus.matrix[this.lisaStatus.currPattern].channel;
 
-            // Build the message
-            console.log ("sending on message, number, when", this.schedulerCursor , when);
-            var msg = { type: "noteon",
-                        channel: ch,
-                        pitch: note,
-                        velocity: vel
-            };
-            this.midiHandler.sendMIDIMessage (msg, when);
+            var midi_note = octave * 12 + note;
 
-            // TODO probably we need to send a midi off when the note ends.
-            // Here we need to decide if continue the note until a new one starts
-            // Or to kill the note at the start of the new step (aka we need a switch)
-            console.log ("sending off message, number, when", this.schedulerCursor , when + interval / 1000);
-            msg = { type: "noteoff",
-                channel: ch,
-                pitch: note,
-                velocity: vel
-            };
-            this.midiHandler.sendMIDIMessage (msg, when + interval / 1000);
+            if (!isNaN(midi_note)) {
+
+                // Build the message
+                console.log ("sending on message, number, when", this.schedulerCursor , when);
+                var msg = { type: "noteon",
+                            channel: ch,
+                            pitch: note,
+                            velocity: vel
+                };
+                this.midiHandler.sendMIDIMessage (msg, when);
+
+                // TODO probably we need to send a midi off when the note ends.
+                // Here we need to decide if continue the note until a new one starts
+                // Or to kill the note at the start of the new step (aka we need a switch)
+                console.log ("sending off message, number, when", this.schedulerCursor , when + interval / 1000);
+                msg = { type: "noteoff",
+                    channel: ch,
+                    pitch: note,
+                    velocity: vel
+                };
+                this.midiHandler.sendMIDIMessage (msg, when + interval / 1000);
+            }
 
             this.incrementScheduleCursor();
 
@@ -106,6 +112,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.stepLegendList = this.domEl.querySelectorAll('.step-legend');
         this.octaveLegendList = this.domEl.querySelectorAll('.step-octave-legend');
         this.octaveInput = this.domEl.querySelector(".octave-inputs");
+        this.loop_chk = this.domEl.getElementsByClassName("loop_checkbox")[0];
 
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
@@ -231,6 +238,16 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             }
         };
 
+        this.setLoop = function (loop) {
+            if (loop) {
+                this.lisaStatus.loop = true;
+            }
+            else {
+                this.lisaStatus.loop = false;
+            }
+            this.loop_chk.value = this.lisaStatus.loop;
+        }
+
         this.select.addEventListener("change",function(e) {
             console.log ("Changed value of dropdown", e.target.value);
             var page_selected = e.target.value.toLowerCase();
@@ -255,6 +272,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             var st = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[inputN];
             this.refreshNoteLegend (st, value, inputN)
 
+        }.bind(this));
+
+        this.loop_chk.addEventListener("change",function(e) {
+            this.lisaStatus.loop = e.target.checked;
         }.bind(this));
 
         this.patternNumInput.addEventListener("change",function(e) {
@@ -304,7 +325,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             page: 'pitch',
             numPatterns: 4,
             currPattern: 0,
-            tempo: 60
+            tempo: 60,
+            checked: false
         };
 
         for (var i = 0; i < 32; i+=1 ) {
@@ -389,6 +411,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.setRedrawPattern("0");
         this.setTotalPatterns();
         this.setTempo();
+        this.setLoop();
 
         args.hostInterface.setDestructor (function () {
             this.stopScheduler();

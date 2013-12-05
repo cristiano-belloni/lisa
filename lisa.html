@@ -2,8 +2,10 @@
     <div class="lisa-label tempo-label">BPM</div>
     <input step="0.1" min="20" max="300" type="number" class="tempo"/>
 
-    <div class="lisa-label octave-label">Octave</div>
-    <input class="octave"/>
+    <div class="lisa-label loop-label">Loop</div>
+
+    <input id="checkbox-loop" class="loop_checkbox" type="checkbox">
+    <label for="checkbox-loop" class="input-helper input-helper--checkbox"></label>
 
     <div class="dropdown-page">
         <select>
@@ -80,7 +82,7 @@
             <div class="step-legend step-6-legend"></div>
             <div class="step-legend step-7-legend"></div>
         </div>
-        <canvas width="294" height="240" class="bars"></canvas>
+        <canvas width="320" height="240" class="bars"></canvas>
     </div>
 
     <div class="pattern-label">Pattern Number</div>

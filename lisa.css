@@ -38,7 +38,7 @@ input {
     font-size: 14px;
 }
 
-.octave {
+.loop_checkbox {
     position:absolute;
     left: 370px;
     top: 170px;
@@ -178,8 +178,8 @@ input {
     top: 70px;
 }
 
-.octave-label {
-    left: 373px;
+.loop-label {
+    left: 381px;
     top: 142px;
 }
 
@@ -444,4 +444,30 @@ input {
     width:31px;
     background-color: rgb(31, 31, 31);
     border-radius: 2px;
+}
+
+.input-helper {
+    position: absolute;
+    display: inline-block;
+}
+.input-helper:before {
+    content: " ";
+    display: block;
+    position: absolute;
+}
+
+.input-helper--checkbox:before {
+    top: 169px;
+    left: 386px;
+    width: 20px;
+    height: 20px;
+    background: rgb(31, 31, 31);
+    border: 2px solid rgb(40, 40, 40);
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+input[type="checkbox"]:checked + label:before {
+    background: #f06060;
 }
