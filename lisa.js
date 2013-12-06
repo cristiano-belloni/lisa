@@ -27,58 +27,96 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.playing = false;
 
         this.tolerance = 200;
+
+        // Number of steps in a pattern
         this.steps = 8;
 
-        this.schedulerCursor = 0; // current playing position
+        // current playing position
         this.cursorIncrement = 0;
+        this.patternCursor = 0;
+        this.stepCursor = 0;
 
         this.incrementScheduleCursor = function (){
-            this.schedulerCursor = (this.schedulerCursor + 1) % this.steps;
-            this.cursorIncrement += 1;
+            if (this.steps - 1 === this.stepCursor) {
+                // We must increment the pattern
+                if (this.patternCursor + 1 >= this.lisaStatus.numPatterns) {
+                    // We are at the end of patterns
+                    if (this.lisaStatus.loop) {
+                        // Loop, restart from 0.
+                        this.patternCursor = 0;
+                        this.stepCursor = 0;
+                    }
+                    else {
+                        // Must stop here
+                        this.stopScheduler();
+                        return;
+                    }
+                }
+                else {
+                    // We have further patterns; reset the stepCursor only
+                    this.patternCursor += 1;
+                    this.stepCursor = 0;
+                }
+           }
+           else {
+            // We can increment the stepCursor
+            this.stepCursor += 1;
+           }
+           this.cursorIncrement += 1;
         };
 
         this.resetScheduleCursor = function () {
-            this.schedulerCursor = 0;
-        };
-
-        this.resetIncrementCursor = function () {
-            this.cursorIncrement = 0;
+            this.patternCursor = 0;
+            this.stepCursor = 0;
         };
 
         this.play = function (startTime, interval) {
+
+            var sendNote = true;
+            // TODO implement a lookahead to see if we should send an off note
+            var sendOff = true;
 
             // Send a deferred MIDI, starting in: tolerance (delay) in seconds + start time + interval in seconds * step
             var when = this.tolerance / 1000 + startTime + (interval * this.cursorIncrement) / 1000;
 
             // Read the message description from the status
-            var note = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone;
-            var octave = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave;
-            var vel = this.lisaStatus.matrix[this.lisaStatus.currPattern].velocity;
-            var ch = this.lisaStatus.matrix[this.lisaStatus.currPattern].channel;
+            var note = this.lisaStatus.matrix[this.patternCursor].pitch.semitone[this.stepCursor];
+
+            if (note === -1) {
+                sendNote = false;
+            }
+
+            var octave = this.lisaStatus.matrix[this.patternCursor].pitch.octave[this.stepCursor];
+            var vel = this.lisaStatus.matrix[this.patternCursor].velocity[this.stepCursor];
+            var ch = this.lisaStatus.matrix[this.patternCursor].channel[this.stepCursor];
 
             var midi_note = octave * 12 + note;
+            var msg;
 
-            if (!isNaN(midi_note)) {
-
+            if (sendNote) {
                 // Build the message
-                console.log ("sending on message, number, when", this.schedulerCursor , when);
-                var msg = { type: "noteon",
+                msg = { type: "noteon",
                             channel: ch,
-                            pitch: note,
+                            pitch: midi_note,
                             velocity: vel
                 };
                 this.midiHandler.sendMIDIMessage (msg, when);
+            }
 
-                // TODO probably we need to send a midi off when the note ends.
-                // Here we need to decide if continue the note until a new one starts
-                // Or to kill the note at the start of the new step (aka we need a switch)
-                console.log ("sending off message, number, when", this.schedulerCursor , when + interval / 1000);
+            if (sendNote && sendOff) {
                 msg = { type: "noteoff",
                     channel: ch,
-                    pitch: note,
+                    pitch: midi_note,
                     velocity: vel
                 };
                 this.midiHandler.sendMIDIMessage (msg, when + interval / 1000);
+            }
+
+            if (sendNote) {
+                console.log ("sending on message (octave: " + octave + ", semitone: " + note + ") " + "[" +  this.patternCursor + ":" + this.stepCursor + "], with channel: " + ch + ", pitch: " + midi_note + ", vel: " + vel + " @" + when);
+            }
+            else {
+                console.log ("Pitch not defined: not sending");
             }
 
             this.incrementScheduleCursor();
@@ -87,7 +125,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.startScheduler = function () {
             this.playing = true;
-            var interval = (60 / this.status.tempo * 1000) / 2; // Beat interval in ms
+            var interval = (60 / this.lisaStatus.tempo * 1000) / 2; // Beat interval in ms
             console.log ("Interval is: " + interval + " milliseconds");
             var timeNow = this.context.currentTime;
             this.schedulerInterval = setInterval(this.play, interval, timeNow, interval);
@@ -100,8 +138,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.pauseScheduler = function () {
             this.playing = false;
-            this.resetIncrementCursor();
             clearInterval(this.schedulerInterval);
+            this.cursorIncrement = 0;
         };
 
         var canvas = this.domEl.querySelector(".bars");
@@ -113,6 +151,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.octaveLegendList = this.domEl.querySelectorAll('.step-octave-legend');
         this.octaveInput = this.domEl.querySelector(".octave-inputs");
         this.loop_chk = this.domEl.getElementsByClassName("loop_checkbox")[0];
+        this.playButton = this.domEl.querySelector(".play");
+        this.stopButton = this.domEl.querySelector(".stop");
 
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
@@ -246,7 +286,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 this.lisaStatus.loop = false;
             }
             this.loop_chk.value = this.lisaStatus.loop;
-        }
+        };
 
         this.select.addEventListener("change",function(e) {
             console.log ("Changed value of dropdown", e.target.value);
@@ -270,7 +310,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave[inputN] = value;
             // Change note legend
             var st = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[inputN];
-            this.refreshNoteLegend (st, value, inputN)
+            this.refreshNoteLegend (st, value, inputN);
 
         }.bind(this));
 
@@ -294,6 +334,22 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.tempoInput.addEventListener("change",function(e) {
             this.setTempo(e.target.value);
+        }.bind(this));
+
+        this.playButton.addEventListener("click",function(e) {
+            if (this.playing) {
+                this.pauseScheduler();
+                // TODO change button appareance
+            }
+            else {
+                this.startScheduler();
+                // TODO change button appareance
+            }
+        }.bind(this));
+
+        this.stopButton.addEventListener("click",function(e) {
+            this.stopScheduler();
+            // TODO change button appareance
         }.bind(this));
 
         this.refreshNoteLegend = function (st, oct, bar_num) {
