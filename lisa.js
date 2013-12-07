@@ -15,6 +15,32 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
     var pluginFunction = function(args) {
 
+        // Helper functions, adapted from jQuery
+
+        var AddClassToElement = function (elem,value){
+            var rspaces = /\s+/;
+            var classNames = (value || "").split( rspaces );
+            var className = " " + elem.className + " ",
+                setClass = elem.className;
+            for ( var c = 0, cl = classNames.length; c < cl; c++ ) {
+                if ( className.indexOf( " " + classNames[c] + " " ) < 0 ) {
+                    setClass += " " + classNames[c];
+                }
+            }
+            elem.className = setClass.replace(/^\s+|\s+$/g,'');//trim
+        };
+
+        var RemoveClassFromElement = function (elem,value){
+            var rspaces = /\s+/;
+            var rclass = /[\n\t]/g;
+            var classNames = (value || "").split( rspaces );
+            var className = (" " + elem.className + " ").replace(rclass, " ");
+            for ( var c = 0, cl = classNames.length; c < cl; c++ ) {
+                className = className.replace(" " + classNames[c] + " ", " ");
+            }
+            elem.className = className.replace(/^\s+|\s+$/g,'');//trim
+        };
+
         this.name = args.name;
         this.id = args.id;
         this.context = args.audioContext;
@@ -36,7 +62,12 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.patternCursor = 0;
         this.stepCursor = 0;
 
+        this.lastHighlightedNote = 7;
+
         this.incrementScheduleCursor = function (){
+
+            var stop = false;
+
             if (this.steps - 1 === this.stepCursor) {
                 // We must increment the pattern
                 if (this.patternCursor + 1 >= this.lisaStatus.numPatterns) {
@@ -48,8 +79,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     }
                     else {
                         // Must stop here
-                        this.stopScheduler();
-                        return;
+                        stop = true;
                     }
                 }
                 else {
@@ -63,11 +93,30 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             this.stepCursor += 1;
            }
            this.cursorIncrement += 1;
+
+            RemoveClassFromElement (this.stepLegendList[this.lastHighlightedNote], "note-highlight");
+            this.lastHighlightedNote = (this.lastHighlightedNote + 1) % this.steps;
+            AddClassToElement (this.stepLegendList[this.lastHighlightedNote], "note-highlight");
+
+            if (stop) {
+                this.stopScheduler();
+                return;
+            }
+
+            if (this.lastHighlightedNote === 0) {
+                // Start of pattern
+                this.setRedrawPattern(this.patternCursor);
+            }
+
         };
 
         this.resetScheduleCursor = function () {
             this.patternCursor = 0;
             this.stepCursor = 0;
+            this.lastHighlightedNote = 7;
+            for (var i = 0; i < this.stepLegendList.length; i+=1 ) {
+                RemoveClassFromElement (this.stepLegendList[i], "note-highlight");
+            }
         };
 
         this.play = function (startTime, interval) {
@@ -129,17 +178,20 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             console.log ("Interval is: " + interval + " milliseconds");
             var timeNow = this.context.currentTime;
             this.schedulerInterval = setInterval(this.play, interval, timeNow, interval);
+            this.playButton.textContent = "Pause";
         };
 
         this.stopScheduler = function () {
             this.pauseScheduler();
             this.resetScheduleCursor();
+            this.playButton.textContent = "Play";
         };
 
         this.pauseScheduler = function () {
             this.playing = false;
             clearInterval(this.schedulerInterval);
             this.cursorIncrement = 0;
+            this.playButton.textContent = "Play";
         };
 
         var canvas = this.domEl.querySelector(".bars");
@@ -163,32 +215,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             'velocity': {color: 'rgba(100,210,0, 0.8)', lightColor: 'rgba(140,210,0, 0.8)', lighterColor: 'rgba(165,210,0,0.8)', lightestColor: 'rgba(190,210,0,0.8)'},
             'channel': {color: 'rgba(255, 69, 0, 0.8)', lightColor: 'rgba(255, 140, 0, 0.8)', lighterColor: 'rgba(255, 165, 0, 0.8)', lightestColor: 'rgba(255, 190, 0, 0.8)'},
             'pitch': {color: 'rgba(0,100,210, 0.8)', lightColor: 'rgba(0,140,210, 0.8)', lighterColor: 'rgba(0,165,210,0.8)', lightestColor: 'rgba(0,190,210,0.8)'}
-        };
-
-        // Helper functions, adapted from jQuery
-
-        var AddClassToElement = function (elem,value){
-            var rspaces = /\s+/;
-            var classNames = (value || "").split( rspaces );
-            var className = " " + elem.className + " ",
-                setClass = elem.className;
-            for ( var c = 0, cl = classNames.length; c < cl; c++ ) {
-                if ( className.indexOf( " " + classNames[c] + " " ) < 0 ) {
-                    setClass += " " + classNames[c];
-                }
-            }
-            elem.className = setClass.replace(/^\s+|\s+$/g,'');//trim
-        };
-
-        var RemoveClassFromElement = function (elem,value){
-            var rspaces = /\s+/;
-            var rclass = /[\n\t]/g;
-            var classNames = (value || "").split( rspaces );
-            var className = (" " + elem.className + " ").replace(rclass, " ");
-            for ( var c = 0, cl = classNames.length; c < cl; c++ ) {
-                className = className.replace(" " + classNames[c] + " ", " ");
-            }
-            elem.className = className.replace(/^\s+|\s+$/g,'');//trim
         };
 
         this.reInitBars = function (colors, valueArr, translateFunc) {
@@ -339,17 +365,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.playButton.addEventListener("click",function(e) {
             if (this.playing) {
                 this.pauseScheduler();
-                // TODO change button appareance
             }
             else {
                 this.startScheduler();
-                // TODO change button appareance
             }
         }.bind(this));
 
         this.stopButton.addEventListener("click",function(e) {
             this.stopScheduler();
-            // TODO change button appareance
         }.bind(this));
 
         this.refreshNoteLegend = function (st, oct, bar_num) {

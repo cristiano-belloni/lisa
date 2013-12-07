@@ -471,3 +471,7 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked + label:before {
     background: #f06060;
 }
+
+.note-highlight {
+    color: rgb(255, 204, 0);
+}
