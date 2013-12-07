@@ -87,8 +87,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             }
 
             var octave = this.lisaStatus.matrix[this.patternCursor].pitch.octave[this.stepCursor];
-            var vel = this.lisaStatus.matrix[this.patternCursor].velocity[this.stepCursor];
-            var ch = this.lisaStatus.matrix[this.patternCursor].channel[this.stepCursor];
+            var vel = this.lisaStatus.matrix[this.patternCursor].velocity[this.stepCursor] * 127;
+            var ch = this.lisaStatus.matrix[this.patternCursor].channel[this.stepCursor] * 16;
 
             var midi_note = octave * 12 + note;
             var msg;
