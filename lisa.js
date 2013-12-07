@@ -247,8 +247,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             }
         };
 
-        this.setRedrawPattern = function (newPattern) {
-            if (this.lisaStatus.currPattern !== newPattern) {
+        this.setRedrawPattern = function (newPattern, force) {
+            if (force || this.lisaStatus.currPattern !== newPattern) {
                 this.patternNumInput.value = newPattern;
                 this.lisaStatus.currPattern = newPattern;
                 this.switchPage();
@@ -376,24 +376,30 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             this.octaveLegendList[step].value = octValue;
         };
 
-        this.lisaStatus = {
-            matrix: [],
-            page: 'pitch',
-            numPatterns: 4,
-            currPattern: 0,
-            tempo: 60,
-            checked: false
-        };
+        if (args.initialState && args.initialState.data) {
+            /* Load data */
+            this.lisaStatus = args.initialState.data;
+        }
+        else {
+            this.lisaStatus = {
+                matrix: [],
+                page: 'pitch',
+                numPatterns: 4,
+                currPattern: 0,
+                tempo: 60,
+                checked: false
+            };
 
-        for (var i = 0; i < 32; i+=1 ) {
-            this.lisaStatus.matrix.push ({
-                pitch: {
-                    semitone: [-1,-1,-1,-1,-1,-1,-1,-1],
-                    octave: [4,4,4,4,4,4,4,4]
-                },
-                velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
-                channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625]
-            });
+            for (var i = 0; i < 32; i+=1 ) {
+                this.lisaStatus.matrix.push ({
+                    pitch: {
+                        semitone: [-1,-1,-1,-1,-1,-1,-1,-1],
+                        octave: [4,4,4,4,4,4,4,4]
+                    },
+                    velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
+                    channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625]
+                });
+            }
         }
 
         this.viewWidth = canvas.width;
@@ -464,7 +470,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         }
 
         // Init function
-        this.setRedrawPattern("0");
+        this.setRedrawPattern("0", true);
         this.setTotalPatterns();
         this.setTempo();
         this.setLoop();
@@ -472,6 +478,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         args.hostInterface.setDestructor (function () {
             this.stopScheduler();
         }.bind(this));
+
+        var saveState = function () {
+            return { data: this.lisaStatus };
+        };
+        args.hostInterface.setSaveState (saveState.bind(this));
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
