@@ -52,7 +52,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.playing = false;
 
-        this.tolerance = 200;
+        this.tolerance = 750;
 
         // Number of steps in a pattern
         this.steps = 8;
