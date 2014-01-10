@@ -209,12 +209,20 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
             'velocity': this.domEl.querySelector('.velocity-legend-container'),
-            'channel': this.domEl.querySelector('.channel-legend-container')
+            'channel': this.domEl.querySelector('.channel-legend-container'),
+            'ctrl1': this.domEl.querySelector('.velocity-legend-container'),
+            'ctrl2': this.domEl.querySelector('.velocity-legend-container'),
+            'ctrl3': this.domEl.querySelector('.velocity-legend-container'),
+            'ctrl4': this.domEl.querySelector('.velocity-legend-container')
         };
         this.colorSchemas = {
             'velocity': {color: 'rgba(100,210,0, 0.8)', lightColor: 'rgba(140,210,0, 0.8)', lighterColor: 'rgba(165,210,0,0.8)', lightestColor: 'rgba(190,210,0,0.8)'},
             'channel': {color: 'rgba(255, 69, 0, 0.8)', lightColor: 'rgba(255, 140, 0, 0.8)', lighterColor: 'rgba(255, 165, 0, 0.8)', lightestColor: 'rgba(255, 190, 0, 0.8)'},
-            'pitch': {color: 'rgba(0,100,210, 0.8)', lightColor: 'rgba(0,140,210, 0.8)', lighterColor: 'rgba(0,165,210,0.8)', lightestColor: 'rgba(0,190,210,0.8)'}
+            'pitch': {color: 'rgba(0,100,210, 0.8)', lightColor: 'rgba(0,140,210, 0.8)', lighterColor: 'rgba(0,165,210,0.8)', lightestColor: 'rgba(0,190,210,0.8)'},
+            'ctrl1': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
+            'ctrl2': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
+            'ctrl3': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
+            'ctrl4': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
         };
 
         this.reInitBars = function (colors, valueArr, translateFunc) {
@@ -269,6 +277,18 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     };
                     this.reInitBars(this.colorSchemas.pitch, this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone, translate);
                     this.reInitOctaveLegend(this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch);
+                    break;
+                case 'ctrl1':
+                    this.reInitBars(this.colorSchemas.ctrl1, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl1);
+                    break;
+                case 'ctrl2':
+                    this.reInitBars(this.colorSchemas.ctrl2, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl2);
+                    break;
+                case 'ctrl3':
+                    this.reInitBars(this.colorSchemas.ctrl3, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl3);
+                    break;
+                case 'ctrl4':
+                    this.reInitBars(this.colorSchemas.ctrl4, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl4);
                     break;
             }
         };
@@ -420,7 +440,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         octave: [4,4,4,4,4,4,4,4]
                     },
                     velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
-                    channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625]
+                    channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625],
+                    "ctrl1": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
+                    "ctrl2": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
+                    "ctrl3": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
+                    "ctrl4": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5]
                 });
             }
         }
@@ -475,6 +499,13 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         this.stepLegendList[bar_num].innerHTML = normal_value * 16;
                     }
                 }
+                else if (this.lisaStatus.page.indexOf("ctrl") === 0) {
+                    var ctrln = this.lisaStatus.page;
+                    // 128 here because 0 is "don't send"
+                    var val = Math.round (value * 128);
+                    this.lisaStatus.matrix[this.lisaStatus.currPattern][ctrln][bar_num] = value;
+                    this.stepLegendList[bar_num].innerHTML = val - 1;
+                }
 
                 this.ui.refresh();
             }.bind(this),
@@ -483,7 +514,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.barElements = [];
 
-        for (i = 0; i < 8; i += 1) {
+        for (var i = 0; i < 8; i += 1) {
             clickBarArgs.ID = "bar_" + i;
             clickBarArgs.left = (i * barWidth + (i+1) * spaceWidth);
             var el = new K2.ClickBar(clickBarArgs);
