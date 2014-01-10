@@ -3,7 +3,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
     var pluginConf = {
         name: "Lisa",
         osc: false,
-        version: '0.0.1-alpha1',
+        version: '0.0.2',
         ui: {
             type: 'div',
             width: 464,
@@ -252,14 +252,20 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.switchPage = function () {
             // Hide / show static legend classes
+            var hidden = 0, shown = 0;
             for (var legendContainerEl in this.staticLegends) {
                 if (legendContainerEl !== this.lisaStatus.page) {
                     // hide
                     AddClassToElement(this.staticLegends[legendContainerEl], 'hidden');
+                    hidden += 1;
                 }
                 else {
                     // show
                     RemoveClassFromElement(this.staticLegends[legendContainerEl], 'hidden');
+                    shown += 1;
+                }
+                if ((shown > 0) && (hidden > 0)) {
+                    break;
                 }
             }
 
