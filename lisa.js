@@ -227,7 +227,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             'ctrl1': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
             'ctrl2': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
             'ctrl3': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
-            'ctrl4': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'},
+            'ctrl4': {color: 'rgba(100,100,210, 0.8)', lightColor: 'rgba(100,140,210, 0.8)', lighterColor: 'rgba(100,165,210,0.8)', lightestColor: 'rgba(100,190,210,0.8)'}
         };
 
         this.reInitBars = function (colors, valueArr, translateFunc) {
@@ -298,16 +298,16 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     this.reInitOctaveLegend(this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch);
                     break;
                 case 'ctrl1':
-                    this.reInitBars(this.colorSchemas.ctrl1, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl1);
+                    this.reInitBars(this.colorSchemas.ctrl1, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl1.values);
                     break;
                 case 'ctrl2':
-                    this.reInitBars(this.colorSchemas.ctrl2, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl2);
+                    this.reInitBars(this.colorSchemas.ctrl2, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl2.values);
                     break;
                 case 'ctrl3':
-                    this.reInitBars(this.colorSchemas.ctrl3, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl3);
+                    this.reInitBars(this.colorSchemas.ctrl3, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl3.values);
                     break;
                 case 'ctrl4':
-                    this.reInitBars(this.colorSchemas.ctrl4, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl4);
+                    this.reInitBars(this.colorSchemas.ctrl4, this.lisaStatus.matrix[this.lisaStatus.currPattern].ctrl4.values);
                     break;
             }
         };
@@ -385,11 +385,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             var page = this.lisaStatus.page;
             value = parseInt(value, 10);
             if (isNaN(value)) {
-                //this.dynamicTypeContainer.value = this.lisaStatus.matrix[this.lisaStatus.currPattern].;
+                this.dynamicTypeContainer.value = this.lisaStatus.matrix[this.lisaStatus.currPattern][page].type;
                 return;
             }
             console.log ("Type for " + page + " is " + value);
-            //this.lisaStatus.matrix[this.lisaStatus.currPattern]. = value;
+            this.lisaStatus.matrix[this.lisaStatus.currPattern][page].type = value;
         }.bind(this));
 
         this.loop_chk.addEventListener("change",function(e) {
@@ -473,10 +473,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     },
                     velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
                     channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625],
-                    "ctrl1": [0,0,0,0.5,0.5,0.5,0.5,0.5],
-                    "ctrl2": [0,0,0,0.5,0.5,0.5,0.5,0.5],
-                    "ctrl3": [0,0,0,0.5,0.5,0.5,0.5,0.5],
-                    "ctrl4": [0,0,0,0.5,0.5,0.5,0.5,0.5]
+                    "ctrl1": {type: -1, values: [0,0,0,0,0,0,0,0]},
+                    "ctrl2": {type: -1, values: [0,0,0,0,0,0,0,0]},
+                    "ctrl3": {type: -1, values: [0,0,0,0,0,0,0,0]},
+                    "ctrl4": {type: -1, values: [0,0,0,0,0,0,0,0]}
                 });
             }
         }
@@ -535,7 +535,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     var ctrln = this.lisaStatus.page;
                     // 128 here because 0 is "don't send"
                     var val = Math.round (value * 128);
-                    this.lisaStatus.matrix[this.lisaStatus.currPattern][ctrln][bar_num] = value;
+                    this.lisaStatus.matrix[this.lisaStatus.currPattern][ctrln]["values"][bar_num] = value;
                     this.stepLegendList[bar_num].innerHTML = val - 1;
                 }
 
