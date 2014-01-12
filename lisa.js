@@ -121,6 +121,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.play = function (startTime, interval) {
 
+            var msgArray = [];
+
             var sendNote = true;
             // TODO implement a lookahead to see if we should send an off note
             var sendOff = true;
@@ -149,7 +151,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                             pitch: midi_note,
                             velocity: vel
                 };
-                this.midiHandler.sendMIDIMessage (msg, when);
+                msgArray.push(msg);
             }
 
             if (sendNote && sendOff) {
@@ -158,15 +160,17 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     pitch: midi_note,
                     velocity: vel
                 };
-                this.midiHandler.sendMIDIMessage (msg, when + interval / 1000);
+                msgArray.push(msg);
             }
 
-            if (sendNote) {
+            this.midiHandler.sendMIDIMessage (msgArray, when + interval / 1000);
+
+            /*if (sendNote) {
                 console.log ("sending on message (octave: " + octave + ", semitone: " + note + ") " + "[" +  this.patternCursor + ":" + this.stepCursor + "], with channel: " + ch + ", pitch: " + midi_note + ", vel: " + vel + " @" + when);
             }
             else {
                 console.log ("Pitch not defined: not sending");
-            }
+            }*/
 
             this.incrementScheduleCursor();
 
@@ -447,10 +451,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     },
                     velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
                     channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625],
-                    "ctrl1": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
-                    "ctrl2": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
-                    "ctrl3": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
-                    "ctrl4": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5]
+                    "ctrl1": [0,0,0,0.5,0.5,0.5,0.5,0.5],
+                    "ctrl2": [0,0,0,0.5,0.5,0.5,0.5,0.5],
+                    "ctrl3": [0,0,0,0.5,0.5,0.5,0.5,0.5],
+                    "ctrl4": [0,0,0,0.5,0.5,0.5,0.5,0.5]
                 });
             }
         }
