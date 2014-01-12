@@ -209,6 +209,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.loop_chk = this.domEl.getElementsByClassName("loop_checkbox")[0];
         this.playButton = this.domEl.querySelector(".play");
         this.stopButton = this.domEl.querySelector(".stop");
+        this.dynamicTypeContainer = this.domEl.querySelector(".dynamic-type-container");
 
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
@@ -255,6 +256,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         };
 
         this.switchPage = function () {
+            if (this.lisaStatus.page.indexOf("ctrl") === 0) {
+                // Show the dynamic-type-container
+                RemoveClassFromElement(this.dynamicTypeContainer, 'hidden');
+            }
+            else {
+                // Hide it
+                AddClassToElement(this.dynamicTypeContainer, 'hidden');
+            }
             // Hide / show static legend classes
             var hidden = 0, shown = 0;
             for (var legendContainerEl in this.staticLegends) {
@@ -368,6 +377,19 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             var st = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[inputN];
             this.refreshNoteLegend (st, value, inputN);
 
+        }.bind(this));
+
+        this.dynamicTypeContainer.addEventListener("change",function(e) {
+            console.log ("Changed value of the type input", e.target.id, e.target.value);
+            var value = e.target.value;
+            var page = this.lisaStatus.page;
+            value = parseInt(value, 10);
+            if (isNaN(value)) {
+                //this.dynamicTypeContainer.value = this.lisaStatus.matrix[this.lisaStatus.currPattern].;
+                return;
+            }
+            console.log ("Type for " + page + " is " + value);
+            //this.lisaStatus.matrix[this.lisaStatus.currPattern]. = value;
         }.bind(this));
 
         this.loop_chk.addEventListener("change",function(e) {

@@ -50,14 +50,14 @@ input {
 .pattern-num {
     position:absolute;
     left: 128px;
-    bottom: 17px;
+    bottom: 10px;
     width: 30px;
 }
 
 .patterns-total {
     position:absolute;
     left: 302px;
-    bottom: 17px;
+    bottom: 10px;
     width: 30px;
 }
 
@@ -66,8 +66,17 @@ input {
     font-family: "Helvetica Neue";
     position: absolute;
     font-size: 14px;
-    bottom: 20px;
+    bottom: 13px;
     left: 8px;
+}
+
+.type-label {
+    color: white;
+    font-family: "Helvetica Neue";
+    position: absolute;
+    font-size: 14px;
+    top: -5px;
+    left: 4px;
 }
 
 .pattern-total-label {
@@ -75,7 +84,7 @@ input {
     font-family: "Helvetica Neue";
     position: absolute;
     font-size: 14px;
-    bottom: 20px;
+    bottom: 13px;
     left: 194px;
 }
 
@@ -206,6 +215,12 @@ input {
     position: absolute;
     bottom: 4px;
     right: 4px;
+}
+
+.message-type-input {
+    position: absolute;
+    top: -8px;
+    left: 120px;
 }
 
 .step-octave-legend {
