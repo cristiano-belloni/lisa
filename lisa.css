@@ -189,7 +189,7 @@ input {
 }
 
 .bar-container {
-    top: 0;
+    top: 11px;
     left: 2px;
     background: black;
     width: 334px;
@@ -210,7 +210,7 @@ input {
 
 .step-octave-legend {
     position: absolute;
-    top: 0px;
+    top: -11px;
     width: 26px;
     font-family: "Helvetica Neue";
 }
