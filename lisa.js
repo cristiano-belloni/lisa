@@ -164,14 +164,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             }
 
             this.midiHandler.sendMIDIMessage (msgArray, when + interval / 1000);
-
-            /*if (sendNote) {
-                console.log ("sending on message (octave: " + octave + ", semitone: " + note + ") " + "[" +  this.patternCursor + ":" + this.stepCursor + "], with channel: " + ch + ", pitch: " + midi_note + ", vel: " + vel + " @" + when);
-            }
-            else {
-                console.log ("Pitch not defined: not sending");
-            }*/
-
             this.incrementScheduleCursor();
 
         }.bind(this);
@@ -210,6 +202,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.playButton = this.domEl.querySelector(".play");
         this.stopButton = this.domEl.querySelector(".stop");
         this.dynamicTypeContainer = this.domEl.querySelector(".dynamic-type-container");
+        this.dynamicTypeContainerInput = this.domEl.querySelector(".dynamic-type-container input");
 
         this.staticLegends = {
             'pitch': this.domEl.querySelector('.note-legend-container'),
@@ -259,6 +252,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             if (this.lisaStatus.page.indexOf("ctrl") === 0) {
                 // Show the dynamic-type-container
                 RemoveClassFromElement(this.dynamicTypeContainer, 'hidden');
+                var msgType = this.lisaStatus.matrix[this.lisaStatus.currPattern][this.lisaStatus.page].type;
+                this.dynamicTypeContainerInput.value = msgType;
             }
             else {
                 // Hide it
@@ -385,7 +380,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             var page = this.lisaStatus.page;
             value = parseInt(value, 10);
             if (isNaN(value)) {
-                this.dynamicTypeContainer.value = this.lisaStatus.matrix[this.lisaStatus.currPattern][page].type;
+                this.dynamicTypeContainerInput.value = this.lisaStatus.matrix[this.lisaStatus.currPattern][page].type;
                 return;
             }
             console.log ("Type for " + page + " is " + value);
@@ -473,10 +468,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     },
                     velocity: [0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75],
                     channel: [0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625],
-                    "ctrl1": {type: -1, values: [0,0,0,0,0,0,0,0]},
-                    "ctrl2": {type: -1, values: [0,0,0,0,0,0,0,0]},
-                    "ctrl3": {type: -1, values: [0,0,0,0,0,0,0,0]},
-                    "ctrl4": {type: -1, values: [0,0,0,0,0,0,0,0]}
+                    "ctrl1": {type: 52, values: [0,0,0,0,0,0,0,0]},
+                    "ctrl2": {type: 53, values: [0,0,0,0,0,0,0,0]},
+                    "ctrl3": {type: 54, values: [0,0,0,0,0,0,0,0]},
+                    "ctrl4": {type: 55, values: [0,0,0,0,0,0,0,0]}
                 });
             }
         }
