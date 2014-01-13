@@ -175,11 +175,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         type: "controlchange",
                         channel: ch,
                         control: type,
-                        value: value - 1
+                        value: value * 127 - 1
                     });
                 }
             }
-    
+
             this.midiHandler.sendMIDIMessage (msgArray, when);
             this.midiHandler.sendMIDIMessage (nextArray, when + interval / 1000);
 
