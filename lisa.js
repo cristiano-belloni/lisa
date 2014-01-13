@@ -163,6 +163,21 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 msgArray.push(msg);
             }
 
+            // See http://www.gweep.net/~prefect/eng/reference/protocol/midispec.html#CC
+            for (var ctrlPage = 1; ctrlPage <= 4; ctrlPage+=1) {
+                var controller = "ctrl" + ctrlPage;
+                var value = this.lisaStatus.matrix[this.patternCursor][controller].values[this.stepCursor];
+                if (value !== -1) {
+                    var type = this.lisaStatus.matrix[this.patternCursor][controller].type;
+                    msgArray.push( {
+                        type: "controlchange",
+                        channel: ch,
+                        control: type,
+                        value: value
+                    });
+                }
+            }
+
             this.midiHandler.sendMIDIMessage (msgArray, when + interval / 1000);
             this.incrementScheduleCursor();
 
@@ -449,6 +464,15 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         if (args.initialState && args.initialState.data) {
             /* Load data */
             this.lisaStatus = args.initialState.data;
+            /* Backwards compatibility */
+            if (typeof this.lisaStatus.matrix[0]["ctrl1"] === 'undefined') {
+                for (var i = 0; i < 32; i+=1 ) {
+                    this.lisaStatus.matrix[i]["ctrl1"] = {type: 52, values: [0,0,0,0,0,0,0,0]},
+                    this.lisaStatus.matrix[i]["ctrl2"] = {type: 53, values: [0,0,0,0,0,0,0,0]},
+                    this.lisaStatus.matrix[i]["ctrl3"] = {type: 54, values: [0,0,0,0,0,0,0,0]},
+                    this.lisaStatus.matrix[i]["ctrl4"] = {type: 55, values: [0,0,0,0,0,0,0,0]}
+                }
+            }
         }
         else {
             this.lisaStatus = {
