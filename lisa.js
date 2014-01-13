@@ -3,7 +3,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
     var pluginConf = {
         name: "Lisa",
         osc: false,
-        version: '0.0.2',
+        version: '0.0.3',
         ui: {
             type: 'div',
             width: 464,
@@ -190,7 +190,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.startScheduler = function () {
             this.playing = true;
             var interval = (60 / this.lisaStatus.tempo * 1000) / 2; // Beat interval in ms
-            console.log ("Interval is: " + interval + " milliseconds");
             var timeNow = this.context.currentTime;
             this.schedulerInterval = setInterval(this.play, interval, timeNow, interval);
             this.playButton.textContent = "Pause";
@@ -373,7 +372,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         };
 
         this.select.addEventListener("change",function(e) {
-            console.log ("Changed value of dropdown", e.target.value);
             var page_selected = e.target.value.toLowerCase();
             if (page_selected !== this.lisaStatus.page) {
                 this.lisaStatus.page = page_selected;
@@ -382,7 +380,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         }.bind(this));
 
         this.octaveInput.addEventListener("change",function(e) {
-            console.log ("Changed value of one of the octave input", e.target.id, e.target.value);
             var value = e.target.value;
             var inputN = e.srcElement.className.split(" ")[1].split("-")[1];
             value = parseInt(value, 10);
@@ -399,7 +396,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         }.bind(this));
 
         this.dynamicTypeContainer.addEventListener("change",function(e) {
-            console.log ("Changed value of the type input", e.target.id, e.target.value);
             var value = e.target.value;
             var page = this.lisaStatus.page;
             value = parseInt(value, 10);
@@ -407,7 +403,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 this.dynamicTypeContainerInput.value = this.lisaStatus.matrix[this.lisaStatus.currPattern][page].type;
                 return;
             }
-            console.log ("Type for " + page + " is " + value);
             this.lisaStatus.matrix[this.lisaStatus.currPattern][page].type = value;
         }.bind(this));
 
@@ -457,7 +452,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                 var nn = Note.prototype.midi2Name(midi_note);
                 name = nn.name.split('/')[0];
             }
-            console.log ("Note name is: ", name);
 
             this.stepLegendList[bar_num].innerHTML = name;
         };
@@ -511,7 +505,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
         this.viewWidth = canvas.width;
         this.viewHeight = canvas.height;
-        console.log (this.viewWidth, this.viewHeight);
         this.ui = new K2.UI ({type: 'CANVAS2D', target: canvas});
 
         var barWidth =  31;
@@ -527,7 +520,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
 
                 var normal_value;
                 var bar_num = parseInt (element.split("_")[1], 10);
-                console.log ("Bar " + bar_num + " set at: " + value * 8);
 
                 if (this.lisaStatus.page === 'pitch') {
                     normal_value = Math.round(value * 12) / 12;
@@ -536,7 +528,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     }
                     else {
                         var st = normal_value === 0 ? -1 : (normal_value * 12 - 1);
-                        console.log ("Setting note ", st);
 
                         this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.semitone[bar_num] = st;
                         var oct = this.lisaStatus.matrix[this.lisaStatus.currPattern].pitch.octave[bar_num];
@@ -583,12 +574,13 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             clickBarArgs.left = (i * barWidth + (i+1) * spaceWidth);
             var el = new K2.ClickBar(clickBarArgs);
             this.ui.addElement(el);
-            //this.ui.setValue ({elementID: clickBarArgs.ID, slot: 'barvalue', value: 0.5});
             this.barElements.push(el);
         }
 
         // Init function
-        this.setRedrawPattern("0", true);
+        this.setRedrawPattern(this.lisaStatus.currPattern.toString(), true);
+        // Set the page selector to the correct value
+        this.select.value = this.lisaStatus.page.charAt(0).toUpperCase() + this.lisaStatus.page.slice(1);
         this.setTotalPatterns();
         this.setTempo();
         this.setLoop();
