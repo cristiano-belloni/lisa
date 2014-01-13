@@ -122,6 +122,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.play = function (startTime, interval) {
 
             var msgArray = [];
+            // MIDI messages to be sent at the end of the step.
+            var nextArray = [];
 
             var sendNote = true;
             // TODO implement a lookahead to see if we should send an off note
@@ -160,7 +162,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     pitch: midi_note,
                     velocity: vel
                 };
-                msgArray.push(msg);
+                nextArray.push(msg);
             }
 
             // See http://www.gweep.net/~prefect/eng/reference/protocol/midispec.html#CC
@@ -177,8 +179,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     });
                 }
             }
+    
+            this.midiHandler.sendMIDIMessage (msgArray, when);
+            this.midiHandler.sendMIDIMessage (nextArray, when + interval / 1000);
 
-            this.midiHandler.sendMIDIMessage (msgArray, when + interval / 1000);
             this.incrementScheduleCursor();
 
         }.bind(this);
