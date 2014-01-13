@@ -167,13 +167,13 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
             for (var ctrlPage = 1; ctrlPage <= 4; ctrlPage+=1) {
                 var controller = "ctrl" + ctrlPage;
                 var value = this.lisaStatus.matrix[this.patternCursor][controller].values[this.stepCursor];
-                if (value !== -1) {
+                if (value) {
                     var type = this.lisaStatus.matrix[this.patternCursor][controller].type;
                     msgArray.push( {
                         type: "controlchange",
                         channel: ch,
                         control: type,
-                        value: value
+                        value: value - 1
                     });
                 }
             }
