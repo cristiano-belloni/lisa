@@ -268,32 +268,37 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         };
 
         this.switchPage = function () {
-            if (this.lisaStatus.page.indexOf("ctrl") === 0) {
+
+            var isCtrlPage = (this.lisaStatus.page.indexOf("ctrl") === 0);
+            var isVelPage = (this.lisaStatus.page === "velocity");
+
+            // Hide / show static legend classes
+            for (var legendContainerEl in this.staticLegends) {
+                if (legendContainerEl !== this.lisaStatus.page) {
+                    // hide
+                    AddClassToElement(this.staticLegends[legendContainerEl], 'hidden');
+                }
+                else {
+                    // show
+                    RemoveClassFromElement(this.staticLegends[legendContainerEl], 'hidden');
+                }
+            }
+
+            if (isCtrlPage || isVelPage) {
+                // The static custom container (the velocity one) could have been hidden; show it now
+                RemoveClassFromElement(this.staticLegends[this.lisaStatus.page], 'hidden');
+            }
+
+            // Additional things to show if we're in a control page
+            if (isCtrlPage) {
                 // Show the dynamic-type-container
                 RemoveClassFromElement(this.dynamicTypeContainer, 'hidden');
                 var msgType = this.lisaStatus.matrix[this.lisaStatus.currPattern][this.lisaStatus.page].type;
                 this.dynamicTypeContainerInput.value = msgType;
             }
             else {
-                // Hide it
+                // Hide the dynamic-type-container
                 AddClassToElement(this.dynamicTypeContainer, 'hidden');
-            }
-            // Hide / show static legend classes
-            var hidden = 0, shown = 0;
-            for (var legendContainerEl in this.staticLegends) {
-                if (legendContainerEl !== this.lisaStatus.page) {
-                    // hide
-                    AddClassToElement(this.staticLegends[legendContainerEl], 'hidden');
-                    hidden += 1;
-                }
-                else {
-                    // show
-                    RemoveClassFromElement(this.staticLegends[legendContainerEl], 'hidden');
-                    shown += 1;
-                }
-                if ((shown > 0) && (hidden > 0)) {
-                    break;
-                }
             }
 
             switch (this.lisaStatus.page) {
