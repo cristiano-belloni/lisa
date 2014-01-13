@@ -175,7 +175,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                         type: "controlchange",
                         channel: ch,
                         control: type,
-                        value: value * 127 - 1
+                        value: Math.round(value * 128 - 1)
                     });
                 }
             }
@@ -555,11 +555,15 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
                     }
                 }
                 else if (this.lisaStatus.page.indexOf("ctrl") === 0) {
-                    var ctrln = this.lisaStatus.page;
-                    // 128 here because 0 is "don't send"
-                    var val = Math.round (value * 128);
+                    var val, ctrln = this.lisaStatus.page;
+                    if (value === 0) {
+                        val = '-';
+                    }
+                    else {
+                        val = Math.round(value * 128 - 1);
+                    }
                     this.lisaStatus.matrix[this.lisaStatus.currPattern][ctrln]["values"][bar_num] = value;
-                    this.stepLegendList[bar_num].innerHTML = val - 1;
+                    this.stepLegendList[bar_num].innerHTML = val;
                 }
 
                 this.ui.refresh();
