@@ -1,9 +1,9 @@
-define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesconference/nu.js/nu','./lisa.html!text', './lisa.css!text'], function(require, K2, Note, htmlTemp, cssTemp) {
+define(['require', 'github:pieroxy/lz-string@master/libs/lz-string-1.3.3-min', 'github:janesconference/KievII@0.6.0/kievII', './lisa.html!text', './lisa.css!text'], function(require, LZString, K2, htmlTemp, cssTemp) {
 
     var pluginConf = {
         name: "Lisa",
         osc: false,
-        version: '0.0.3',
+        version: '0.0.4',
         ui: {
             type: 'div',
             width: 464,
@@ -45,8 +45,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         this.id = args.id;
         this.context = args.audioContext;
         this.domEl = args.div;
-
-        this.note = new Note({frequency:440});
 
         this.midiHandler = args.MIDIHandler;
 
@@ -465,8 +463,17 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         };
 
         if (args.initialState && args.initialState.data) {
-            /* Load data */
-            this.lisaStatus = args.initialState.data;
+
+            /* Backwards compatibility */
+            if (typeof args.initialState.data.matrix === "undefined") {
+                // This is the right way to do it
+                var uncompressed = LZString.decompressFromBase64(args.initialState.data);
+                this.lisaStatus = JSON.parse(uncompressed);
+            }
+            else {
+                this.lisaStatus = args.initialState.data;
+            }
+
             /* Backwards compatibility */
             if (typeof this.lisaStatus.matrix[0]["ctrl1"] === 'undefined') {
                 for (var i = 0; i < 32; i+=1 ) {
@@ -590,7 +597,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'github:janesco
         }.bind(this));
 
         var saveState = function () {
-            return { data: this.lisaStatus };
+            var jsonString = JSON.stringify(this.lisaStatus);
+            var compressed = LZString.compressToBase64(jsonString);
+            return { data: compressed };
         };
         args.hostInterface.setSaveState (saveState.bind(this));
 
