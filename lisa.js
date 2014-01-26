@@ -4,6 +4,7 @@ define(['require', 'github:pieroxy/lz-string@master/libs/lz-string-1.3.3-min', '
         name: "Lisa",
         osc: false,
         version: '0.0.4',
+        hyaId: 'Lisa',
         ui: {
             type: 'div',
             width: 464,
