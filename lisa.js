@@ -139,7 +139,7 @@ define(['require', 'github:pieroxy/lz-string@master/libs/lz-string-1.3.3-min', '
             }
 
             var octave = this.lisaStatus.matrix[this.patternCursor].pitch.octave[this.stepCursor];
-            var vel = this.lisaStatus.matrix[this.patternCursor].velocity[this.stepCursor] * 127;
+            var vel = Math.round(this.lisaStatus.matrix[this.patternCursor].velocity[this.stepCursor] * 127);
             var ch = this.lisaStatus.matrix[this.patternCursor].channel[this.stepCursor] * 16;
 
             var midi_note = octave * 12 + note;
