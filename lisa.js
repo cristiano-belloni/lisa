@@ -1,4 +1,4 @@
-define(['require', 'github:pieroxy/lz-string@master/libs/lz-string-1.3.3-min', 'github:janesconference/KievII@0.6.0/kievII', './lisa.html!text', './lisa.css!text'], function(require, LZString, K2, htmlTemp, cssTemp) {
+define(['require', 'github:pieroxy/lz-string@release/libs/lz-string-1.3.3-min', 'github:janesconference/KievII@0.6.0/kievII', './lisa.html!text', './lisa.css!text'], function(require, LZString, K2, htmlTemp, cssTemp) {
 
     var pluginConf = {
         name: "Lisa",
